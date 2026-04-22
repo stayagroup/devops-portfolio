@@ -8,14 +8,12 @@
 # =============================================================================
 set -euo pipefail
 
-# Функция для красивого вывода заголовка
+# Функция для вывода заголовка с аргументом
 print_header() {
+    local title="${1:-SYSTEM INFORMATION REPORT}"
     echo "=================================================="
-    echo "         SYSTEM INFORMATION REPORT"
+    echo "  $title"
     echo "=================================================="
-    echo "Generated at: $(date '+%Y-%m-%d %H:%M:%S')"
-    echo "=================================================="
-    echo ""
 }
 
 # Функция для красивого вывода подзаголовка
@@ -25,58 +23,43 @@ print_subheader() {
     echo "----------------------------------------------"
 }
 
-# Функция для вывода информации в столбцы
-print_info_columns() {
-    local cols=("$@")
-    local width=50
-    local fmt="[%s]"
-    local i
-    local total_cols=${#cols[@]}
-    local col_width=$((width / total_cols))
-    for i in "${!cols[@]}"; do
-        echo "${cols[i]}" | head -c $col_width
-        printf '%s'
-    done
-}
-
 # Основная функция вывода
 main() {
-    print_header
+    print_header "System Information Report"
+    echo "Generated at: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "Host: $(hostname)"
+    echo ""
 
     # 1. Информация об ОС
     print_subheader "Operating System Information"
-    echo "Hostname     : $(hostname)"
-    echo "Kernel       : $(uname -r)"
-    echo "OS Name      : $(cat /etc/os-release | grep PRETTY_NAME | cut -d'=' -f2 | tr -d '"' | tr -d "'" )"
-    echo "Architecture : $(uname -m)"
-    echo "Platform     : $(uname -p)"
+    echo "Hostname      : $(hostname)"
+    echo "Kernel        : $(uname -r)"
+    echo "Architecture  : $(uname -m)"
+    echo "Platform      : $(uname -p)"
+    echo "OS Name       : $(grep PRETTY_NAME /etc/os-release | cut -d'=' -f2 | tr -d '"' | tr -d "'")"
     echo ""
 
     # 2. Информация о CPU
     print_subheader "CPU Information"
-    echo "Model         : $(lscpu | grep 'Model name' | cut -d: -f2 | xargs)"
-    echo "Cores         : $(lscpu | grep 'CPU(s)' | awk '{print $2}')"
-    echo "Threads       : $(lscpu | grep 'Thread(s)' | awk '{print $2}')"
-    echo "Socket        : $(lscpu | grep 'Socket(s)' | awk '{print $2}')"
-    echo "CPU Usage     : $(top -bn1 | grep 'Cpu(s)' | awk '{printf "%.0f", $8}')%"
+    echo "Model         : $(lscpu | grep '^Model name:' | cut -d: -f2 | xargs)"
+    echo "Cores         : $(lscpu | grep '^CPU(s):' | awk '{print $2}')"
+    echo "Threads       : $(lscpu | grep '^Thread(s):' | awk '{print $2}')"
+    echo "Socket        : $(lscpu | grep '^Socket(s):' | awk '{print $2}')"
+    echo "CPU Usage     : $(top -bn1 | grep 'Cpu(s)' | awk '{printf "%.0f%%", 100-$8}')"
     echo ""
 
     # 3. Информация о памяти
     print_subheader "Memory Information"
     echo "Total Memory  : $(free -h | grep Mem | awk '{print $2}')"
-    echo "Available     : $(free -h | grep Mem | awk '{print $7}')"
-    echo "Used          : $(free -h | grep Mem | awk '{print $3}')"
-    echo "Usage         : $(free -h | grep Mem | awk '{printf "%.0f%%", $4 / $2 * 100}')"
-    echo "Buffer/Cache  : $(free -h | grep Mem | awk '{print $4}')"
+    echo "Used Memory   : $(free | grep Mem | awk '{print $3}')"
+    echo "Available     : $(free | grep Mem | awk '{print $4}')"
+    echo "Usage         : $(free | grep Mem | awk '{printf "%.1f%%", $3/$2 * 100}')"
+    echo "Buffers/Cache : $(free -h | grep Mem | awk '{print $6}')"
     echo ""
 
     # 4. Информация о дисках
-    print_subheader "Disk Information"
-    echo "=================================================="
-    print_header "Disk Usage (by root)"
+    print_subheader "Disk Usage (by root)"
     df -h /
-    print_subheader "Filesystems"
-    df -h
     echo ""
 
     # 5. Сетевые подключения
@@ -84,22 +67,16 @@ main() {
     ip -br addr show
     echo ""
 
-    # 6. Загрузка процессов
-    print_subheader "Top Processes (CPU & Memory)"
-    echo "=================================================="
-    print_header "Top 10 Processes by CPU Usage"
-    top -bn1 | head -20
+    # 6. Загрузочная информация
+    print_subheader "System Uptime"
+    uptime
     echo ""
 
-    # 7. Загрузочная информация
-    print_subheader "Boot Information"
-    uptime
-
-    # 8. Логи
-    print_subheader "System Logs (Last 5 Errors)"
-    echo "=================================================="
-    print_header "Recent System Errors (dmesg)"
-    dmesg 2>/dev/null | grep -i "error\|fail" | tail -5
+    # 7. Логи (последние ошибки)
+    print_subheader "Recent System Errors (dmesg)"
+    if [ -t 1 ]; then
+        dmesg 2>/dev/null | grep -i "error\|fail" | tail -5
+    fi
     echo ""
 
     print_header
