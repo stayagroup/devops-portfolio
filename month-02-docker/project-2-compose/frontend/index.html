@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Full Stack App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>DevOps Full Stack Application</h1>
+            <p>Frontend → Backend → PostgreSQL</p>
+        </header>
+
+        <section class="card">
+            <h2>Add New User</h2>
+            <form id="userForm">
+                <input type="text" id="userName" placeholder="Name" required>
+                <input type="email" id="userEmail" placeholder="Email" required>
+                <button type="submit">Add User</button>
+            </form>
+            <div id="message" class="message"></div>
+        </section>
+
+        <section class="card">
+            <h2>Users List</h2>
+            <button onclick="loadUsers()" class="btn-reload">Reload Users</button>
+            <div id="usersList" class="users-list">
+                <p class="loading">Loading users...</p>
+            </div>
+        </section>
+
+        <section class="card info">
+            <h3>API Information</h3>
+            <p><strong>Backend URL:</strong> <code id="backendUrl">http://localhost:3001</code></p>
+            <p><strong>Database:</strong> PostgreSQL (via Backend)</p>
+            <p><strong>Frontend Port:</strong> 80</p>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001';
+
+        // Load users on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+        });
+
+        // Handle form submission
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const messageDiv = document.getElementById('message');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email })
+                });
+
+                if (response.ok) {
+                    messageDiv.textContent = '✓ User added successfully!';
+                    messageDiv.className = 'message success';
+                    document.getElementById('userForm').reset();
+                    setTimeout(() => loadUsers(), 500);
+                } else {
+                    throw new Error('Failed to add user');
+                }
+            } catch (error) {
+                messageDiv.textContent = '✗ Error: ' + error.message;
+                messageDiv.className = 'message error';
+            }
+        });
+
+        // Load and display users
+        async function loadUsers() {
+            const usersList = document.getElementById('usersList');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/users`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch users');
+                }
+
+                const users = await response.json();
+
+                if (users.length === 0) {
+                    usersList.innerHTML = '<p class="empty">No users found. Add one to get started!</p>';
+                    return;
+                }
+
+                usersList.innerHTML = users.map(user => `
+                    <div class="user-card">
+                        <div class="user-id">#${user.id}</div>
+                        <div class="user-info">
+                            <h4>${user.name}</h4>
+                            <p>${user.email}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                usersList.innerHTML = `<p class="error">Error loading users: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

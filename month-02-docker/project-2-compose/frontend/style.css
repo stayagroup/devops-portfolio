@@ -1,0 +1,207 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.card h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.card h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+/* Form Styles */
+#userForm {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#userForm input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+#userForm input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+#userForm button {
+    padding: 12px 30px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+#userForm button:hover {
+    background: #5568d3;
+}
+
+/* Message Styles */
+.message {
+    padding: 12px;
+    border-radius: 4px;
+    margin-top: 10px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Users List */
+.users-list {
+    display: grid;
+    gap: 15px;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-left: 4px solid #667eea;
+    border-radius: 4px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.user-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.user-id {
+    font-weight: bold;
+    color: #667eea;
+    font-size: 0.9em;
+    background: #f0f4ff;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.user-info h4 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.user-info p {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.loading, .empty, .error {
+    text-align: center;
+    color: #999;
+    padding: 40px 20px;
+}
+
+.error {
+    color: #d32f2f;
+}
+
+/* Button Styles */
+.btn-reload {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+    transition: background 0.3s;
+}
+
+.btn-reload:hover {
+    background: #5568d3;
+}
+
+/* Info Section */
+.info {
+    background: #f9f9f9;
+    border-top: 3px solid #667eea;
+}
+
+.info code {
+    background: #e8eaf6;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    color: #667eea;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    #userForm {
+        flex-direction: column;
+    }
+
+    header h1 {
+        font-size: 1.8em;
+    }
+
+    .card {
+        padding: 20px;
+    }
+}
